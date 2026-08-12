@@ -1,0 +1,15 @@
+fastapi
+numpy
+pandas
+PyMySQL
+pydantic
+SQLAlchemy
+typing
+uvicorn
+bcrypt==4.0.1
+jose
+python-jose
+joblib
+scikit-learn==1.7.2
+passlib==1.7.4
+dotenv

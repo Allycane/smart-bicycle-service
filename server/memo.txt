@@ -1,0 +1,52 @@
+- 라우터 연결
+
+-- member
+"로그인" 과 "회원가입" 은 '/member' 라우터를 이용하여 연결
+member_router 상에서 /api/member/login, /api/member/signup 등
+
+-- riding, bike
+1. /riding/start
+2. /routes
+3. /riding/routes/:id
+
+4. /bike/seoul
+5. /bike/seoul/stations
+6. /bike/seoul/analysis
+7. /bike/seoul/forecast
+"riding"과 "bike"의 라우터를 합쳐 진행하려고 하였으나, 서로 분리된 페이지인 것을 확인하고 중단.
+다만, /bike/seoul에서 원하는 루트를 선택하면 /riding/routes/id로 넘어간다.
+
+-----------------------------------------------
+
+-----------------------------------------------
+
+-- dashboard
+로그인 이후 회원정보를 뿌려주는 페이지
+
+로그인이 완료되어도 토큰이 저장되지 않아 페이지 이동 시, 로그인 상태가 유지되지 않는다. -> 토큰을 캐시에 저장하도록 서버 연결
+
+
+-------------------------------------------------------
+2026.08.12
+1. 회원가입 FastAPI 라우터 + DB 연동
+- 회원가입 라우터 구성
+- 회원가입에 필요한 member schema.py와 model.py 형성
+- schema 내에서 추가적인 validation check 진행 로직 추가
+    - @model_validator를 이용하여 validation check 진행
+        - 비밀번호가 일정 길이 이상인가
+        - 비밀번호와 비밀번호 확인이 일치하는가
+        - 필수 약관에 동의 체크를 하였는가
+- model 내에서 다양한 입력 형식을 추가
+    - JSON 방식
+    - Boolean 방식
+- member_router 내에서 비밀번호 암호화
+    - core.security.py -> hash_password를 이용해 입력된 비밀번호 암호화
+
+2. 로그인 FastAPI 라우터 + DB 연동
+- 로그인 라우터 구성
+- 로그인에 필요한 MemberItem 클래스 정의
+- 암호화 된 비밀번호와 로그인을 시도하는 비밀번호의 일치 여부 체크
+- 닉네임과 비밀번호가 일치하지 않을 시, 로그인 거부
+
+3. 로그아웃 FastAPI 라우터
+- 로그아웃 라우터 구성
