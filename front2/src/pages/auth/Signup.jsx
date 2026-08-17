@@ -66,59 +66,6 @@ export default function Signup() {
     }
   };
 
-  // const handleSubmit = async(e) => {
-  //   e.preventDefault();
-
-  //   if (!form.nickname.trim()) {
-  //     setErrors(p => ({...p, nickname : '닉네임을 입력해주세요!'}));
-  //     return;
-  //   }
-  //   if (!/^\S+@\S+\.\S+$/.test(form.email)) {
-  //     setErrors(p => ({...p, email : "이메일을 입력해주세요!"}));
-  //     return;
-  //   }
-  //   if (!form.password) {
-  //     setErrors(p => ({...p, password : "비밀번호를 입력해주세요!"}));
-  //     return;
-  //   }
-  //   if (form.passwordConfirm !== form.password) {
-  //     setErrors(p => ({...p, passwordConfirm : "비밀번호가 일치하지 않습니다!"}));
-  //     return;
-  //   }
-  //   if (!form.agreeRequired) {
-  //     setErrors(p => ({...p, agreeRequired : '필수 약관에 동의해주세요!'}));
-  //     return;
-  //   }
-
-  //   const fastForm = {
-  //     "nickname" : form.nickname,
-  //     "email" : form.email,
-  //     "password" : form.password,
-  //     "passwordConfirm" : form.passwordConfirm,
-  //     "ridingStyles" : form.ridingStyles,
-  //     "agreeRequired" : form.agreeRequired,
-  //     "agreeMarketing" : form.agreeMarketing
-  //   }
-
-  //   const response = await fetch(
-  //     '/api/member/signup',
-  //     {
-  //       "method" : "POST",
-  //       "headers" : {
-  //         "Content-Type" : "application/json"
-  //       },
-  //       "body" : JSON.stringify(fastForm)
-  //     }
-  //   )
-
-  //   const result = await response.json();
-  //   if (result.isSignup) {
-  //     alert(result.message);
-  //     navigate(ROUTES.DASHBOARD);
-  //     // 추후에 로그인 페이지로 라우팅 진행
-  //   }
-  // }
-
   const handleSocial = async (provider) => {
     await provider();
     navigate(ROUTES.DASHBOARD);

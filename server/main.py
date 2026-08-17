@@ -4,7 +4,8 @@ from database.connection import engine, Base
 import os
 
 from routers.member import member_router
-from routers.riding import riding_router
+from routers.dashboard import dashboard_router
+# from routers.riding import riding_router
 # from routers.bike import bike_router
 
 Base.metadata.create_all(bind=engine)
@@ -13,7 +14,7 @@ app = FastAPI()
 
 origins = os.getenv(
     "FRONT_ORIGINS",
-    "http://localhost:5173, http://localhost:5174"
+    "http://localhost:5173, http://localhost:5174, http://localhost:5173/dashboard"
 ).split(',')
 
 app.add_middleware(
@@ -25,5 +26,6 @@ app.add_middleware(
 )
 
 app.include_router(member_router, prefix='/api/member')
-app.include_router(riding_router, prefix='/api/riding')
+app.include_router(dashboard_router, prefix='/api/dashboard')
+# app.include_router(riding_router, prefix='/api/riding')
 # app.include_router(bike_router, prefix='/api/bike')

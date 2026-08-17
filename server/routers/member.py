@@ -4,7 +4,7 @@ from models.member_model import MemberModel
 from sqlalchemy.orm import Session
 from database.connection import get_db
 # 입력된 패스워드를 암호화 하여 저장하도록 하는 라이브러리 추가 설치
-from core.security import hash_password, verify_password, create_access_token, create_refresh_token
+from core.security import hash_password, verify_password, create_access_token, create_refresh_token, get_current_user
 
 member_router = APIRouter()
 
@@ -12,7 +12,7 @@ REFRESH_COOKIE_NAME = "refreshToken"
 REFRESH_COOKIE_MAX_AGE = 60 * 60 * 24 * 7 # 7일
 
 # signin
-@member_router.post('/signin')
+@member_router.post('/signup')
 async def signin(member_item:Member, db:Session = Depends(get_db)) -> dict:
     # db 연동 로직
     member_model = MemberModel(
@@ -21,9 +21,7 @@ async def signin(member_item:Member, db:Session = Depends(get_db)) -> dict:
         password = hash_password(member_item.password),
         riding_styles = member_item.riding_styles,
         agree_required = member_item.agree_required,
-        agree_marketing = member_item.agree_marketing,
-        role = member_item.role,
-        created_id = member_item.created_id
+        agree_marketing = member_item.agree_marketing
     )
 
     db.add(member_model)
@@ -37,13 +35,13 @@ async def signin(member_item:Member, db:Session = Depends(get_db)) -> dict:
 
 @member_router.post('/login')
 async def login(login_item:MemberItem, response: Response, db:Session = Depends(get_db)) -> dict:
-    member_model = db.get(MemberModel, login_item.nickname)
+    member_model = db.query(MemberModel).filter(MemberModel.email == login_item.email).first()
 
     # 등록된 닉네임이 없을 경우, 로그인 거부
     if member_model is None:
         return {
             "isLogin" : False,
-            "message" : '등록되지 않은 닉네임 입니다.'
+            "message" : '등록되지 않은 계정 입니다.'
         }
 
     # 비밀번호가 일치하는지에 대한 결과를 result 변수로 입력
@@ -71,8 +69,11 @@ async def login(login_item:MemberItem, response: Response, db:Session = Depends(
     return {
         "message" : "로그인에 성공하였습니다!",
         "isLogin" : True,
-        "role" : member_model.role,
-        "accessToken" : access_token
+        "accessToken" : access_token,
+        "user" : {
+            "nickname" : member_model.nickname,
+            "role" : member_model.role
+        }
     }
 
 @member_router.post('/logout')
@@ -81,4 +82,19 @@ async def logout(response: Response) -> dict:
     return {
         "isLogout" : True,
         "message" : "로그아웃이 완료되었습니다."
+    }
+
+@member_router.get('/me')
+async def get_me(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)) -> dict:
+    member_model = db.get(MemberModel, current_user["nickname"])
+
+    if member_model is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="회원 정보를 찾을 수 없습니다."
+        )
+
+    return {
+        "nickname": member_model.nickname,
+        "role": member_model.role
     }

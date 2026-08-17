@@ -18,9 +18,20 @@ export default function Dashboard() {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState(ACTIVITY_TABS[0]);
 
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    dashboardService.getDashboard().then(setData);
+    dashboardService
+      .getDashboard()
+      .then(setData)
+      .catch((err) => {
+        console.error("대시보드 로드 실패:", err.response?.status, err.response?.data);
+        setError(err.response?.data?.detail || "대시보드를 불러오지 못했습니다.");
+      });
   }, []);
+
+  if (error) return <div className="p-8 text-danger">{error}</div>;
+  if (!data) return <Loading />;
 
   if (!data) return <Loading />;
 

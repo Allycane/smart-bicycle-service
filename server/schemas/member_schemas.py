@@ -21,9 +21,6 @@ class Member(BaseModel):
         alias="agreeMarketing"
     )
 
-    role : str
-    created_id : datetime
-
     @model_validator(mode="after")
     def validate_user(self):
         if len(self.password) < 8:
@@ -44,14 +41,14 @@ class Member(BaseModel):
         return self
 
 class MemberItem(BaseModel):
-    nickname : str
+    email : str
     password : str
 
     model_config = ConfigDict(
         json_schema_extra={
             "examples" : [
                 {
-                    "nickname" : "hong",
+                    "email" : "hong@a.com",
                     "password" : "pw000000"
                 }
             ]
