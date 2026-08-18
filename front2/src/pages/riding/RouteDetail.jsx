@@ -6,8 +6,8 @@ import Button from "../../components/common/Button";
 import Logo from "../../components/common/Logo";
 import AreaChartCard from "../../components/charts/AreaChartCard";
 import Loading from "../../components/common/Loading";
+import EmptyState from "../../components/common/EmptyState";
 import routeService from "../../services/routeService";
-import { ROUTES_MOCK } from "../../constants/mockData";
 import { ROUTES } from "../../constants/routes";
 
 const SAFETY_ICONS = [Shield, Battery, Zap, Users];
@@ -16,15 +16,51 @@ export default function RouteDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [route, setRoute] = useState(null);
+  const [notFound, setNotFound] = useState(false);
+  const [otherRoutes, setOtherRoutes] = useState([]);
 
   useEffect(() => {
     setRoute(null);
-    routeService.getRouteDetail(id).then(setRoute);
+    setNotFound(false);
+    routeService
+      .getRouteDetail(id)
+      .then(setRoute)
+      .catch((err) => {
+        console.error("루트 상세 로드 실패:", err.response?.status, err.response?.data);
+        setNotFound(true);
+      });
   }, [id]);
 
-  if (!route) return <Loading />;
+  // "다른 루트" 추천 목록. 본문과 독립적으로 로드하며, 실패해도 본문 표시를 막지 않는다.
+  useEffect(() => {
+    routeService
+      .getRoutes()
+      .then((routes) => {
+        setOtherRoutes(routes.filter((r) => r.id !== id).slice(0, 2));
+      })
+      .catch((err) => {
+        console.error("다른 루트 목록 로드 실패:", err.response?.status, err.response?.data);
+        setOtherRoutes([]);
+      });
+  }, [id]);
 
-  const otherRoutes = ROUTES_MOCK.filter((r) => r.id !== route.id).slice(0, 2);
+  if (notFound) {
+    return (
+      <div className="mx-auto max-w-2xl px-6 py-24">
+        <EmptyState
+          title="루트를 찾을 수 없습니다"
+          description="삭제되었거나 존재하지 않는 루트예요. 다른 루트를 둘러보세요."
+        />
+        <div className="mt-6 flex justify-center">
+          <Button as={Link} to={ROUTES.PERSONAL_ROUTES}>
+            루트 탐색으로 이동
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!route) return <Loading />;
 
   const infoItems = [
     { icon: Map, label: "총 거리", value: route.distance },

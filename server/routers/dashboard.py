@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -7,6 +8,7 @@ from database.connection import get_db
 from core.security import get_current_user
 from models.member_model import MemberModel
 from models.dashboard_model import MemberStatusModel
+from models.routes_model import RouteModel
 from schemas.dashboard_schemas import DashboardResponse
 
 dashboard_router = APIRouter()
@@ -22,10 +24,11 @@ DEFAULT_TOTALS = [
     {"icon": "TrendingUp", "label": "평균 속도", "value": 0, "unit": "km/h"},
 ]
 
+# routes 테이블이 아직 비어있을 때(시드 전 등) 사용하는 최종 fallback 값.
 DEFAULT_RECOMMENDED_ROUTE = {
     "id": 0,
     "name": "추천 루트가 아직 없어요",
-    "image": "/images/routes/placeholder.jpg",
+    "image": "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1200&q=70",
     "distance": "0km",
     "duration": "0분",
 }
@@ -61,7 +64,6 @@ async def get_dashboard(
         status_model = MemberStatusModel(
             nickname=nickname,
             totals=DEFAULT_TOTALS,
-            recommended_route=DEFAULT_RECOMMENDED_ROUTE,
             quick_menu=DEFAULT_QUICK_MENU,
             community_feed=DEFAULT_COMMUNITY_FEED,
         )
@@ -76,6 +78,20 @@ async def get_dashboard(
         created_at = created_at.replace(tzinfo=timezone.utc)
     joined_days = (datetime.now(timezone.utc) - created_at).days
 
+    # 대시보드의 "오늘의 AI 추천 루트": 전체 routes 중 매 요청마다 랜덤으로 하나 노출.
+    all_routes = db.query(RouteModel).all()
+    if all_routes:
+        picked = random.choice(all_routes)
+        recommended_route = {
+            "id": picked.id,
+            "name": picked.name,
+            "image": picked.image,
+            "distance": picked.distance,
+            "duration": picked.duration,
+        }
+    else:
+        recommended_route = DEFAULT_RECOMMENDED_ROUTE
+
     return {
         "user": {
             # bike_member 테이블에 별도 "name" 컬럼이 없어 nickname으로 대체함.
@@ -87,7 +103,7 @@ async def get_dashboard(
             "streak": status_model.streak,
         },
         "totals": status_model.totals,
-        "recommendedRoute": status_model.recommended_route,
+        "recommendedRoute": recommended_route,
         "activity": {
             "badges": status_model.badges,
             "challenges": status_model.challenges,

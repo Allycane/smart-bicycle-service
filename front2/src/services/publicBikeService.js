@@ -7,7 +7,6 @@ import {
   TOP_STATIONS,
   AGE_DISTRIBUTION,
   AI_INSIGHTS,
-  ROUTES_MOCK,
   FORECAST_STATIONS,
 } from "../constants/mockData";
 
@@ -21,14 +20,11 @@ async function getSummary() {
   }
 }
 
-// 향후 FastAPI: GET /api/bike/seoul/routes
+// FastAPI: GET /api/routes?bikeType=따릉이
+// (routes 테이블을 개인 루트와 통합해서 쓰기로 했으므로, bikeType으로 필터링해서 재사용한다)
 async function getBikeRoutes() {
-  try {
-    const { data } = await api.get("/bike/seoul/routes");
-    return data;
-  } catch {
-    return ROUTES_MOCK.filter((r) => r.bikeType === "따릉이");
-  }
+  const { data } = await api.get("/api/routes", { params: { bikeType: "따릉이" } });
+  return data;
 }
 
 // 향후 FastAPI: GET /api/bike/seoul/stations

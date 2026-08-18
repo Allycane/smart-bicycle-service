@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, LogOut } from "lucide-react";
 import Logo from "../common/Logo";
 import Button from "../common/Button";
+import { useAuth } from "../../context/AuthContext";
 import { ROUTES } from "../../constants/routes";
 
 const NAV_ITEMS = [
@@ -13,6 +14,12 @@ const NAV_ITEMS = [
 
 export default function PublicHeader({ backTo, backLabel, centerLabel, showNav = false, showAuthActions = true }) {
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate(ROUTES.HOME);
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-bg/95 backdrop-blur">
@@ -47,14 +54,35 @@ export default function PublicHeader({ backTo, backLabel, centerLabel, showNav =
         )}
 
         {showAuthActions ? (
-          <div className="flex items-center gap-4">
-            <Link to={ROUTES.LOGIN} className="hidden text-sm text-gray-300 hover:text-white sm:block">
-              로그인
-            </Link>
-            <Button as={Link} to={ROUTES.SIGNUP} size="sm">
-              무료 가입
-            </Button>
-          </div>
+          isAuthenticated ? (
+            <div className="flex items-center gap-4">
+              <Link
+                to={ROUTES.DASHBOARD}
+                className="flex items-center gap-2 text-sm text-gray-300 hover:text-white"
+              >
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-neon text-xs font-bold text-black">
+                  {user?.nickname?.[0] || "P"}
+                </span>
+                <span className="hidden sm:block">{user?.nickname || "라이더"}</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1 text-sm text-gray-400 hover:text-white"
+              >
+                <LogOut className="h-4 w-4" />
+                로그아웃
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <Link to={ROUTES.LOGIN} className="hidden text-sm text-gray-300 hover:text-white sm:block">
+                로그인
+              </Link>
+              <Button as={Link} to={ROUTES.SIGNUP} size="sm">
+                무료 가입
+              </Button>
+            </div>
+          )
         ) : (
           <div className="w-24" />
         )}

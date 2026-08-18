@@ -43,9 +43,8 @@ class MemberStatusModel(Base):
     # 예: [{"icon": "Route", "label": "이번 달 주행거리", "value": 0, "unit": "km"}, ...]
     totals: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
 
-    # data.recommendedRoute
-    # 예: {"id": 1, "name": "...", "image": "...", "distance": "...", "duration": "..."}
-    recommended_route: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    # data.recommendedRoute 는 더 이상 여기 저장하지 않는다.
+    # -> routers/dashboard.py 에서 매 요청마다 routes 테이블에서 랜덤으로 하나 뽑아 응답한다.
 
     # data.quickMenu
     # 예: [{"label": "루트 탐색", "path": "/routes", "icon": "Map"}, ...]
