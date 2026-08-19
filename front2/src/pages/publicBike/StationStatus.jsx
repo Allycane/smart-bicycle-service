@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import StationCard from "../../components/cards/StationCard";
 import AreaChartCard from "../../components/charts/AreaChartCard";
 import Loading from "../../components/common/Loading";
+import EmptyState from "../../components/common/EmptyState";
 import publicBikeService from "../../services/publicBikeService";
 
 const LEGEND = [
@@ -12,10 +13,25 @@ const LEGEND = [
 
 export default function StationStatus() {
   const [data, setData] = useState(null);
+  const [loadError, setLoadError] = useState(null);
 
   useEffect(() => {
-    publicBikeService.getStations().then(setData);
+    publicBikeService
+      .getStations()
+      .then(setData)
+      .catch((err) => {
+        console.error("대여소 현황 로드 실패:", err.response?.status, err.response?.data);
+        setLoadError("대여소 현황을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+      });
   }, []);
+
+  if (loadError) {
+    return (
+      <div className="py-24">
+        <EmptyState title="문제가 발생했습니다" description={loadError} />
+      </div>
+    );
+  }
 
   if (!data) return <Loading />;
 

@@ -31,7 +31,7 @@ function StationRow({ label, station }) {
 }
 
 export default function RouteCard({ route }) {
-  const isBikeShare = typeof route.departure === "object";
+  const isBikeShare = route.departure != null && typeof route.departure === "object";
 
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-card">

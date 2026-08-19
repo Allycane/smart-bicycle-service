@@ -79,7 +79,7 @@ async def list_routes(
     return [_serialize_route(r) for r in routes]
 
 
-@route_router.get("/{route_id}", response_model=RouteOut)
+@route_router.get("/{route_id}", response_model=RouteOut, response_model_exclude_none=True)
 async def get_route_detail(route_id: str, db: Session = Depends(get_db)) -> dict:
     route = db.get(RouteModel, route_id)
 

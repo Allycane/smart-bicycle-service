@@ -3,6 +3,7 @@ import { Zap, Sparkles } from "lucide-react";
 import FeaturedRouteCard from "../../components/cards/FeaturedRouteCard";
 import RouteCard from "../../components/cards/RouteCard";
 import Loading from "../../components/common/Loading";
+import EmptyState from "../../components/common/EmptyState";
 import publicBikeService from "../../services/publicBikeService";
 
 const USAGE_INFO = [
@@ -14,10 +15,25 @@ const USAGE_INFO = [
 
 export default function PublicBikeHome() {
   const [routes, setRoutes] = useState(null);
+  const [loadError, setLoadError] = useState(null);
 
   useEffect(() => {
-    publicBikeService.getBikeRoutes().then(setRoutes);
+    publicBikeService
+      .getBikeRoutes()
+      .then(setRoutes)
+      .catch((err) => {
+        console.error("따릉이 루트 목록 로드 실패:", err.response?.status, err.response?.data);
+        setLoadError("루트 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+      });
   }, []);
+
+  if (loadError) {
+    return (
+      <div className="py-24">
+        <EmptyState title="문제가 발생했습니다" description={loadError} />
+      </div>
+    );
+  }
 
   if (!routes) return <Loading />;
 

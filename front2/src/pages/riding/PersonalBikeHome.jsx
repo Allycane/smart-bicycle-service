@@ -13,13 +13,20 @@ import { ROUTES } from "../../constants/routes";
 
 export default function PersonalBikeHome() {
   const [routes, setRoutes] = useState(null);
+  const [loadError, setLoadError] = useState(null);
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState("전체");
   const [type, setType] = useState("전체");
   const [difficulty, setDifficulty] = useState("전체");
 
   useEffect(() => {
-    routeService.getPersonalRoutes().then(setRoutes);
+    routeService
+      .getPersonalRoutes()
+      .then(setRoutes)
+      .catch((err) => {
+        console.error("루트 목록 로드 실패:", err.response?.status, err.response?.data);
+        setLoadError("루트 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+      });
   }, []);
 
   const featured = useMemo(() => routes?.find((r) => r.tags?.includes("오늘의 추천")), [routes]);
@@ -34,6 +41,17 @@ export default function PersonalBikeHome() {
       .filter((r) => difficulty === "전체" || r.difficulty === difficulty)
       .filter((r) => !keyword || r.name.toLowerCase().includes(keyword) || r.region.toLowerCase().includes(keyword));
   }, [routes, search, region, type, difficulty, featured]);
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-bg text-white">
+        <PublicHeader backTo={ROUTES.HOME} backLabel="홈으로" centerLabel="라이딩 시작하기" />
+        <div className="mx-auto max-w-2xl px-6 py-24">
+          <EmptyState title="문제가 발생했습니다" description={loadError} />
+        </div>
+      </div>
+    );
+  }
 
   if (!routes) return <Loading />;
 

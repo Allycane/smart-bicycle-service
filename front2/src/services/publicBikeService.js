@@ -1,8 +1,6 @@
 import api from "../api/axios";
 import {
   BIKE_HERO_STATS,
-  STATIONS_MOCK,
-  HOURLY_USAGE,
   MONTHLY_USAGE,
   TOP_STATIONS,
   AGE_DISTRIBUTION,
@@ -27,14 +25,10 @@ async function getBikeRoutes() {
   return data;
 }
 
-// 향후 FastAPI: GET /api/bike/seoul/stations
+// FastAPI: GET /api/bike/stations — 서울시청 기준 가까운 대여소 + 시간대별 이용량(placeholder)
 async function getStations() {
-  try {
-    const { data } = await api.get("/bike/seoul/stations");
-    return data;
-  } catch {
-    return { stations: STATIONS_MOCK, hourlyUsage: HOURLY_USAGE };
-  }
+  const { data } = await api.get("/api/bike/stations");
+  return data;
 }
 
 // 향후 FastAPI: GET /api/ai/bike/analysis

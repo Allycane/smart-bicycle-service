@@ -28,7 +28,7 @@ function StationRow({ label, station }) {
 }
 
 export default function FeaturedRouteCard({ route }) {
-  const isBikeShare = typeof route.departure === "object";
+  const isBikeShare = route.departure != null && typeof route.departure === "object";
 
   return (
     <div className="grid overflow-hidden rounded-2xl border border-border bg-card lg:grid-cols-2">
