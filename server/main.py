@@ -7,6 +7,7 @@ from routers.member import member_router
 from routers.dashboard import dashboard_router
 from routers.route import route_router
 from routers.station import station_router
+from routers.analysis import analysis_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -29,4 +30,5 @@ app.include_router(member_router, prefix='/api/member')
 app.include_router(dashboard_router, prefix='/api/dashboard')
 app.include_router(route_router, prefix='/api/routes')
 app.include_router(station_router, prefix='/api/bike/stations')
+app.include_router(analysis_router, prefix='/api/ai/bike/analysis')
 

@@ -1,10 +1,6 @@
 import api from "../api/axios";
 import {
   BIKE_HERO_STATS,
-  MONTHLY_USAGE,
-  TOP_STATIONS,
-  AGE_DISTRIBUTION,
-  AI_INSIGHTS,
   FORECAST_STATIONS,
 } from "../constants/mockData";
 
@@ -31,19 +27,10 @@ async function getStations() {
   return data;
 }
 
-// 향후 FastAPI: GET /api/ai/bike/analysis
+// FastAPI: GET /api/ai/bike/analysis
 async function getAnalysis() {
-  try {
-    const { data } = await api.get("/ai/bike/analysis");
-    return data;
-  } catch {
-    return {
-      monthlyUsage: MONTHLY_USAGE,
-      topStations: TOP_STATIONS,
-      ageDistribution: AGE_DISTRIBUTION,
-      insights: AI_INSIGHTS,
-    };
-  }
+  const { data } = await api.get("/api/ai/bike/analysis");
+  return data;
 }
 
 // FastAPI ML 예측 엔드포인트 (아직 백엔드 미구현 — UI/Request 스키마만 준비된 상태).
